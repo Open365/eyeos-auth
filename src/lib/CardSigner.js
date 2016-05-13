@@ -23,15 +23,15 @@ var log2out = require('log2out');
 
 var CardSigner = function(privatePem, cardHasher) {
 	this.logger = log2out.getLogger('CardSigner');
-	if (settings.keys.privatePem === "" && !privatePem){
-		this.logger.error("Incorrect private key, please provide a valid one.");
-	} else {
-		this.privatePem = privatePem || new Buffer(settings.keys.privatePem, 'base64').toString("utf-8");
-	}
+	this.privatePem = privatePem || new Buffer(settings.keys.privatePem, 'base64').toString("utf-8");
 	this.cardHasher = cardHasher || new CardHasher();
 };
 
 CardSigner.prototype.sign = function(card, signerInjected) {
+	if (settings.keys.privatePem === "") {
+		this.logger.error("Incorrect private key, please provide a valid one.");
+	}
+
 	var hash = this.cardHasher.getHash(card);
 	this.signer = signerInjected || require('crypto').createSign('RSA-SHA256');
 	this.signer.update(hash);
