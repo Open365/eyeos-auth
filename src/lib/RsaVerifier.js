@@ -22,14 +22,14 @@ var log2out = require('log2out');
 
 var RsaVerifier = function(publicPem) {
 	this.logger = log2out.getLogger('RsaVerifier');
-	if (settings.keys.publicPem === "" && !publicPem){
-		this.logger.error("Incorrect public key, please provide a valid one.");
-	} else {
-		this.publicPem = publicPem || new Buffer(settings.keys.publicPem, 'base64').toString("utf-8");
-	}
+	this.publicPem = publicPem || new Buffer(settings.keys.publicPem, 'base64').toString("utf-8");
 };
 
 RsaVerifier.prototype.verify = function(hash, signature, verifierInjected) {
+	if (settings.keys.publicPem) {
+		this.logger.error("Incorrect public key, please provide a valid one.");
+	}
+
 	this.verifier = verifierInjected || require('crypto').createVerify('RSA-SHA256');
 	this.verifier.update(hash);
 	return this.verifier.verify(this.publicPem, signature, 'base64');
