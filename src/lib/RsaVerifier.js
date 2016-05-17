@@ -26,7 +26,7 @@ var RsaVerifier = function(publicPem) {
 };
 
 RsaVerifier.prototype.verify = function(hash, signature, verifierInjected) {
-	if (settings.keys.publicPem) {
+	if (!settings.keys.publicPem) {
 		this.logger.error("Incorrect public key, please provide a valid one.");
 	}
 
