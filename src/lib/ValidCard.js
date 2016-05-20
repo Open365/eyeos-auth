@@ -48,9 +48,9 @@ ValidCard.prototype.getCardForPrincipal = function(userId, callback, principal) 
     })
 };
 
-ValidCard.prototype.getCard = function(userId, cb) {
+ValidCard.prototype.getCard = function(userId, domain, cb) {
     var self = this;
-	this.principalProvider.getPrincipalById(userId, function (err, principal) {
+	this.principalProvider.getPrincipalByIdAndDomain(userId, domain, function (err, principal) {
         if (err) {
             console.error(err);
             return cb(err, null);

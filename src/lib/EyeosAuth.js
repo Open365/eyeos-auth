@@ -42,8 +42,8 @@ EyeosAuth.prototype.verifyRequestWithMini = function(request) {
 	return this.validateEyeosCard.validate(card, signature);
 };
 
-EyeosAuth.prototype.signCard = function(userId, signCardCallback) {
-	this.rsaSigner.signCard(userId, signCardCallback);
+EyeosAuth.prototype.signCard = function(userId, domain, signCardCallback) {
+	this.rsaSigner.signCard(userId, domain, signCardCallback);
 };
 
 EyeosAuth.prototype.signCardForPrincipal = function(principal, signCardCallback) {
@@ -54,7 +54,7 @@ EyeosAuth.prototype.renewCard = function(request, renewCardCallback) {
 	var valid = this.verifyRequest(request);
 	if (valid) {
 		var card = this.requestParser.getCard(request);
-		this.rsaSigner.signCard(card.username, renewCardCallback);
+		this.rsaSigner.signCard(card.username, card.domain, renewCardCallback);
 	} else {
 		renewCardCallback.unSigned();
 	}

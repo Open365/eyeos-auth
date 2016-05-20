@@ -24,12 +24,13 @@ var RsaSigner = require('../lib/RsaSigner'),
 	CardSigner = require('../lib/CardSigner');
 
 suite('RsaSigner suite', function() {
-	var sut, responseFinisherFake, userId = 'user1', validCard, validCardMock, card, minicard, minisignature,
+	var sut, responseFinisherFake, userId = 'user1', domain, validCard, validCardMock, card, minicard, minisignature,
 		cardSigner, cardSignerMock, signature, loginSignCardCallback, loginSignCardCallbackMock;
 	var expValidCardGetCard, expValidCardGetCardForPrincipal, expCardSignerSign, expLoginSignCardCallback;
     var principal;
 
 	setup(function() {
+		domain = "domain";
 		loginSignCardCallback = {
 			signed: function() {}
 		};
@@ -66,28 +67,28 @@ suite('RsaSigner suite', function() {
 	test('signCard should call ValidCard getCard', function() {
 		validCardMock = sinon.mock(validCard);
 		loginSignCardCallbackMock.expects('signed');
-		expValidCardGetCard = validCardMock.expects('getCard').once().withArgs(userId).callsArgWith(1,card);
-		sut.signCard(userId, loginSignCardCallback);
+		expValidCardGetCard = validCardMock.expects('getCard').once().withArgs(userId, domain).callsArgWith(2,card);
+		sut.signCard(userId, domain, loginSignCardCallback);
 		expValidCardGetCard.verify();
 	});
 
 	test('signCard should call CardSigner sign twice', function() {
-		sinon.stub(validCard, 'getCard', function(userId, cb) {
+		sinon.stub(validCard, 'getCard', function(userId, domain, cb) {
 			cb();
 		});
 		expCardSignerSign = cardSignerMock.expects('sign').twice();
 		loginSignCardCallbackMock.expects('signed');
-		sut.signCard(userId, loginSignCardCallback);
+		sut.signCard(userId, domain, loginSignCardCallback);
 		expCardSignerSign.verify();
 	});
 
     test('signCard should call loginSignCardCallback signed with card and signature, minicard and minisignature', function() {
-		sinon.stub(validCard, 'getCard', function(userId, cb) {
+		sinon.stub(validCard, 'getCard', function(userId, domain, cb) {
 			cb(card, minicard);
 		});
 		cardSignerMock.expects('sign').twice().returns(signature); //In this test both are returning signature instead of minisignatue
 		expLoginSignCardCallback = loginSignCardCallbackMock.expects('signed').once().withExactArgs(card, signature, minicard, signature);
-		sut.signCard(userId, loginSignCardCallback);
+		sut.signCard(userId, domain, loginSignCardCallback);
 		expLoginSignCardCallback.verify();
     });
 
