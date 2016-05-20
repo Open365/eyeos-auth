@@ -1,6 +1,6 @@
 {
   "name": "eyeos-auth",
-  "version": "1.0.474",
+  "version": "1.0.475",
   "author": "eyeOS",
   "description": "Library to validate user cards dispached by login",
   "main": "./src/lib/EyeosAuth.js",

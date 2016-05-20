@@ -25,7 +25,7 @@ var EyeosAuth = require('../lib/EyeosAuth'),
 	RsaSigner = require('../lib/RsaSigner');
 
 suite('EyeosAuth suite', function() {
-	var sut, validateEyeosCard, validateEyeosCardMock, request, card, signature, userId,
+	var sut, validateEyeosCard, validateEyeosCardMock, request, card, signature, userId, domain,
 		cardCallback, cardCallbackMock, expectedResult, requestParser, requestParserMock, rsaSigner, rsaSignerMock;
 	var expEyeosCardValidate, expParserGetCard, expParserGetSignature, expCallbackUnSigned;
 	var expRsaSignCard, expRsaSignCardForPrincipal, verifyRequestStub;
@@ -39,18 +39,21 @@ suite('EyeosAuth suite', function() {
         principal= {
             userId: userId,
             systemGroups: []
-        }
+        };
+		userId = "user1";
+		domain = "test";
 		cardCallbackMock = sinon.mock(cardCallback);
 		requestParser = new RequestParser();
 		requestParserMock = sinon.mock(requestParser);
 		expectedResult = true;
-		card = JSON.stringify({
-			'username': 'user1',
+		card = {
+			'username': userId,
+			'domain': domain,
 			'expiration': 3600
-		});
+		};
 		request = {
 			headers: {
-				'Card': card,
+				'Card': JSON.stringify(card),
 				'Signature': signature
 			}
 		};
@@ -76,7 +79,7 @@ suite('EyeosAuth suite', function() {
 		});
 		if (valid) {
 			expRsaSignCard = rsaSignerMock.expects('signCard')
-				.once().withExactArgs(userId, cardCallback);
+				.once().withExactArgs(userId, domain, cardCallback);
 			expParserGetCard = requestParserMock.expects('getCard')
 				.once().withExactArgs(request).returns(card);
 		} else {
@@ -142,10 +145,10 @@ suite('EyeosAuth suite', function() {
 		assert.equal(expectedResult, result);
 	});
 
-	test('signCard should call rsaSigner signCard with userId and callback', function() {
+	test('signCard should call rsaSigner signCard with userId, domain, and callback', function() {
 		expRsaSignCard = rsaSignerMock.expects('signCard')
-			.once().withExactArgs(userId, cardCallback);
-		sut.signCard(userId, cardCallback);
+			.once().withExactArgs(userId, domain, cardCallback);
+		sut.signCard(userId, domain, cardCallback);
 		expRsaSignCard.verify();
 	});
 

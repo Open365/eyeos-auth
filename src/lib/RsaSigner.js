@@ -25,9 +25,9 @@ var RsaSigner = function(validCard, cardSigner) {
 	this.cardSigner = cardSigner || new CardSigner();
 };
 
-RsaSigner.prototype.signCard = function(userId, loginSignCardCallback) {
+RsaSigner.prototype.signCard = function(userId, domain, loginSignCardCallback) {
 	var self = this;
-	this.validCard.getCard(userId, function(card, minicard) {
+	this.validCard.getCard(userId, domain, function(card, minicard) {
 		var signature = self.cardSigner.sign(card);
 		var minisignature = self.cardSigner.sign(minicard);
 		loginSignCardCallback.signed(card, signature, minicard, minisignature);

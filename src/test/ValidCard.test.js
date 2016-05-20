@@ -24,7 +24,7 @@ var settings = require('../lib/settings.js');
 var PrincipalProvider = require('eyeos-principal').PrincipalProvider;
 
 suite('ValidCard suite', function() {
-	var sut, userId = 'user1', principalProvider, principalProviderMock, expGetPrincipal;
+	var sut, userId = 'user1', domain, principalProvider, principalProviderMock, expGetPrincipal;
 	var expectedCard = {
 		'expiration': sinon.match.number,
 		'renewCardDelay': sinon.match.number,
@@ -44,7 +44,7 @@ suite('ValidCard suite', function() {
 		principal = {
 			getPermissions: function() {}
 		};
-
+		domain = "domain";
 		principalProvider = new PrincipalProvider({}, principal);
 		principalProviderMock = sinon.mock(principalProvider);
 
@@ -53,7 +53,7 @@ suite('ValidCard suite', function() {
 
 	test('getCard should return a JSON Card with username and expiration', function() {
 		_setExpectations();
-		sut.getCard(userId, function(result) {
+		sut.getCard(userId, domain, function(result) {
 			var spy = sinon.spy();
 			spy(result);
 			sinon.assert.calledWith(spy, sinon.match(expectedCard));
@@ -93,7 +93,7 @@ suite('ValidCard suite', function() {
 	test('getCard getCardForPrincipal.bind with this, userId and cb', function() {
 		_setExpectations();
 		var getCardForPpalBindSpỳ = sinon.spy(sut.getCardForPrincipal, 'bind');
-		sut.getCard(userId, function(){
+		sut.getCard(userId, domain, function(){
 			assert(getCardForPpalBindSpỳ.calledOnce);
 			assert(getCardForPpalBindSpỳ.calledWith(sut, userId, sinon.match.function));
 		});
@@ -102,13 +102,13 @@ suite('ValidCard suite', function() {
 
 	test('getCard should call getPrincipal on PrincipalProvider with the correct user', function() {
 		_setExpectations();
-		sut.getCard(userId, function() {
+		sut.getCard(userId, domain, function() {
 
 		});
 		expGetPrincipal.verify();
 	});
 
 	function _setExpectations() {
-		expGetPrincipal = principalProviderMock.expects('getPrincipalById').once().withArgs(userId).returns({permissions: ["test"]});
+		expGetPrincipal = principalProviderMock.expects('getPrincipalByIdAndDomain').once().withArgs(userId, domain).returns({permissions: ["test"]});
 	}
 });
